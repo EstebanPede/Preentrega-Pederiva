@@ -1,29 +1,77 @@
-let lineas = {
-    "noviss": 1000,
-    "europa": 1500,
-    "modena": 2000
-};
-
-let tasaInteres = 10;
-let lineaSeleccionada = prompt("Seleccione una línea: Noviss, Europa o Modena").toLowerCase();
-let cantidadCuotas = parseInt(prompt("Ingrese la cantidad de cuotas:"));
-
-// Verificar línea
-if (lineaSeleccionada in lineas && !isNaN(cantidadCuotas) && cantidadCuotas > 0) {
-    let valorLinea = lineas[lineaSeleccionada];
-    let valorCuota = 0 ;
-
-    if (cantidadCuotas === 1) {
-         valorCuota = valorLinea;
-    } 
-    else {
-        // Calcular el valor de cada cuota con el interes
-        let valorInteres = valorLinea * (tasaInteres / 100);
-        let valorTotal = valorLinea + valorInteres;
-         valorCuota = valorTotal / cantidadCuotas;
+class Lineas {
+    constructor(nombre, kgM, proveedor) {
+        this.nombre = nombre;
+        this.kgM = kgM;
+        this.proveedor = proveedor;
     }
 
-    alert("El valor de cada cuota para la " + lineaSeleccionada + " en " + cantidadCuotas + " cuotas es: " + valorCuota.toFixed(2));
-} else {
-    alert("Ingrese una línea válida y una cantidad de cuotas mayor a cero.");
+    calcularPrecioAbertura(anchoCm, altoCm) {
+        const anchoM = anchoCm; // Convertir ancho a metros
+        const altoM = altoCm; // Convertir alto a metros
+
+        const pesoPorMetro = this.kgM * (anchoM + altoM) * 2; // Sumatoria de los cuatro lados en metros
+        const pesoTotalGramos = pesoPorMetro / 100; // Convertir a gramos
+
+        const precioKiloAluminio = 100; // Precio por kilo
+        const costoTotal = (pesoTotalGramos / 1000) * precioKiloAluminio; // Convertir a kilos
+
+        return costoTotal;
+    }
 }
+
+const listaLineas = [];
+let respuesta = 0;
+
+while (respuesta !== -1) {
+    respuesta = Number(prompt("1-Agregar Linea / 2-Mostrar Lineas / 3-Presupuestar / 4-Salir "));
+    switch (respuesta) {
+        case 1:
+            listaLineas.push(agregar());
+            break;
+        case 2:
+            mostrar(listaLineas);
+            break;
+        case 3:
+            presupuestar(listaLineas);
+            break;
+        case 4:
+            respuesta = -1;
+            break;
+        default:
+            alert("Opción no válida.");
+    }
+}
+
+function agregar() {
+    let nombre = prompt("Ingrese la Línea: ");
+    let kgM = Number(prompt("Ingrese su peso en gramos por metro: "));
+    let proveedor = prompt("Ingrese el nombre del proveedor: ");
+
+    return new Lineas(nombre, kgM, proveedor);
+}
+
+function mostrar(listaLineas) {
+    for (let i = 0; i < listaLineas.length; i++) {
+        alert("Producto: " + listaLineas[i].nombre +
+            "\nPeso por kilo: " + listaLineas[i].kgM +
+            "\nProveedor: " + listaLineas[i].proveedor);
+    }
+}
+  
+
+  function presupuestar(listaLineas) {
+    const nombreLinea = prompt("Ingrese el nombre de la línea: ").toLowerCase(); // Convertir a minúsculas
+
+    const lineaSeleccionada = listaLineas.find(linea => linea.nombre.toLowerCase() === nombreLinea);
+
+    if (lineaSeleccionada) {
+        const ancho = Number(prompt("Ingrese el ancho de la abertura en cm: "));
+        const alto = Number(prompt("Ingrese el alto de la abertura en cm: "));
+        const costoAbertura = lineaSeleccionada.calcularPrecioAbertura(ancho, alto);
+        alert(`El costo de la abertura es: $${costoAbertura}`);
+    } else {
+        alert("No se encontró la línea ingresada.");
+    }
+}
+
+
